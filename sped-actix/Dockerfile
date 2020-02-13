@@ -11,4 +11,4 @@ COPY . .
 
 RUN cargo build --release --bin server
 
-CMD ["cargo run --release --bin server"]
+CMD cargo run --release --bin server
