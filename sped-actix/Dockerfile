@@ -9,6 +9,6 @@ RUN cargo build --release --bin stub
 
 COPY . .
 
-RUN cargo install --path=. 
+RUN cargo build --release --bin server
 
-CMD ["server"]
+CMD ["cargo run --release --bin server"]

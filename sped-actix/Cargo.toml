@@ -11,5 +11,9 @@ edition = "2018"
 name = "stub"
 path = "src/bin/stub.rs"
 
+[[bin]]
+name = "server"
+path = "src/main.rs"
+
 [dependencies]
 actix-web = "2.0.0"
