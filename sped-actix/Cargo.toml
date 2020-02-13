@@ -1,0 +1,15 @@
+[package]
+name = "sped-actix"
+version = "0.1.0"
+description = "Data-local web service with KVS and search"
+authors = ["Maksym Vorobiov <maxim.vorobjov@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "stub"
+path = "src/bin/stub.rs"
+
+[dependencies]
+actix-web = "2.0.0"

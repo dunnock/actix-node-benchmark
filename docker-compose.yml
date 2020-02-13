@@ -1,0 +1,47 @@
+version: "2"
+services:
+  node:
+    container_name: node
+    build: ./node
+    depends_on:
+      - database
+    links:
+      - database
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=database
+      - REDIS_HOST=redis
+    volumes:
+      - ./node:/usr/app/
+      - /usr/app/node_modules
+    restart: on-failure
+
+  actix:
+    container_name: actix
+    build: ./sped-actix
+    depends_on:
+      - database
+    links:
+      - database
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=database
+      - REDIS_HOST=redis
+    volumes:
+      - ./sped-actix:/usr/app/
+      - /usr/app/target
+    restart: on-failure
+
+  database:
+    build: ./db
+    container_name: db
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+  redis:
+    image: redis
