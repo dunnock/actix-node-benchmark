@@ -13,8 +13,12 @@ CREATE TABLE tasks (
 	created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS tasks_search ON tasks (
-	assignee_id, summary
+CREATE INDEX IF NOT EXISTS tasks_search_summary ON tasks (
+	summary
+);
+
+CREATE INDEX IF NOT EXISTS tasks_search_assignee ON tasks (
+	assignee_id
 );
 
 CREATE INDEX IF NOT EXISTS workers_search_name ON workers (
