@@ -19,16 +19,16 @@ static DIALOGUES: &str = include!("texts/ring.txt");
 /// Can be run only on empty DB
 #[derive(Deserialize)]
 pub struct CreateTasks {
-    tasks: u32,
-    workers: u32,
+    tasks: i32,
+    workers: i32,
 }
 
 impl Message for CreateTasks {
-    type Result = io::Result<u32>;
+    type Result = io::Result<usize>;
 }
 
 impl Handler<CreateTasks> for PgConnection {
-    type Result = ResponseFuture<io::Result<u32>>;
+    type Result = ResponseFuture<io::Result<usize>>;
 
     fn handle(
         &mut self, CreateTasks { tasks, workers }: CreateTasks, _: &mut Self::Context,
@@ -39,8 +39,8 @@ impl Handler<CreateTasks> for PgConnection {
         let mut gen_text = MarkovChain::new_with_rng(SmallRng::from_entropy());
         gen_text.learn(DIALOGUES);
 
-        let workers_data: Vec<Worker> = (1..workers).map(|id| Worker::gen(id, &mut rng)).collect();
-        let tasks_data: Vec<Task> = (1..tasks).map(|id| Task::gen(id, &workers_data, &mut rng, &mut gen_text)).collect();
+        let workers_data: Vec<Worker> = (1..=workers).map(|id| Worker::gen(id, &mut rng)).collect();
+        let tasks_data: Vec<Task> = (1..=tasks).map(|id| Task::gen(id, &workers_data, &mut rng, &mut gen_text)).collect();
 
         let fut = async move {
             // Copy in workers
@@ -61,10 +61,10 @@ impl Handler<CreateTasks> for PgConnection {
             }
             writer.finish().await?;
 
-            Ok(tasks as u32)
+            Ok(tasks as usize)
         };
 
-        Box::pin(fut.map_err(|err: tokio_postgres::error::Error| io::Error::new(io::ErrorKind::Other, format!("{:?}", err))))
+        Box::pin(fut.map_err(|err: tokio_postgres::error::Error| { dbg!(&err); io::Error::new(io::ErrorKind::Other, format!("{:?}", err)) } ))
     }
 }
 
@@ -75,13 +75,13 @@ impl Handler<CreateTasks> for PgConnection {
 // 	score integer DEFAULT 0
 // );
 struct Worker {
-    id: u32,
+    id: i32,
     name: String,
     email: String
 }
 
 impl Worker {
-    pub fn gen(id: u32, rng: &mut impl RngCore) -> Self {
+    pub fn gen(id: i32, rng: &mut impl RngCore) -> Self {
         let mut name: String = FNAMES[(rng.next_u32() as usize % 100) * 10].to_string();
         name.push(' ');
         name.push_str(LNAMES[(rng.next_u32() as usize % 100) * 10]);
@@ -103,16 +103,17 @@ impl Worker {
 // 	created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 // );
 struct Task {
-    id: u32,
+    id: i32,
     summary: String,
     description: String,
-    assignee_id: u32
+    assignee_id: i32
 }
 
 impl Task {
-    pub fn gen<R: RngCore>(id: u32, workers: &Vec<Worker>, rng: &mut impl RngCore, gen_text: &mut MarkovChain<R>) -> Self {
-        let assignee_id = workers[rng.next_u32() as usize % workers.len()].id;
-        let mut summary: String = workers[assignee_id as usize].name.clone();
+    pub fn gen<R: RngCore>(id: i32, workers: &Vec<Worker>, rng: &mut impl RngCore, gen_text: &mut MarkovChain<R>) -> Self {
+        let assignee = &workers[rng.next_u32() as usize % workers.len()];
+        let assignee_id = assignee.id;
+        let mut summary: String = assignee.name.clone();
         summary.push_str(gen_text.generate(rng.next_u32() as usize % 10).as_str());
         let mut description = summary.clone();
         description.push_str(gen_text.generate(rng.next_u32() as usize % 1000).as_str());

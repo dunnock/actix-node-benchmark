@@ -5,7 +5,7 @@ use futures::FutureExt;
 use super::{PgConnection, Task};
 use actix::{Handler, Message, ResponseFuture};
 
-pub struct GetTask(pub u32);
+pub struct GetTask(pub i32);
 
 impl Message for GetTask {
     type Result = io::Result<Task>;

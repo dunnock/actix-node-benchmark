@@ -8,7 +8,7 @@ use tokio_postgres::NoTls;
 /// Get task data by id
 /// Return 404 if no task found
 #[get("/tasks/{id}")]
-async fn get_task(params: web::Path<u32>, db: web::Data<Addr<PgConnection>>) -> impl Responder {
+async fn get_task(params: web::Path<i32>, db: web::Data<Addr<PgConnection>>) -> impl Responder {
     db.send(GetTask(params.into_inner()))
         .await?
         .map(web::Json)
@@ -59,6 +59,7 @@ async fn main() -> std::io::Result<()> {
             .data_factory(move || PgConnection::connect(db_url.clone()))
             .service(get_task)
             .service(filter_tasks)
+            .service(filldb)
     })
     .bind("127.0.0.1:3001")?
     .run()
