@@ -2,6 +2,8 @@ const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
 
+var debug = require('debug')('app4');
+
 const indexRouter = require('./routes/index')
 
 const app = express()
@@ -27,4 +29,8 @@ app.use(function(err, req, res) {
 	res.render('error')
 })
 
-module.exports = app
+app.set('port', process.env.PORT || 3000);
+
+var server = app.listen(app.get('port'), function() {
+  debug('Express server listening on port ' + server.address().port);
+});
