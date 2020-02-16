@@ -24,28 +24,28 @@ impl Handler<GetTasks> for PgConnection {
     ) -> Self::Result {
 		let cl = self.client();
 		let like = |s| format!("%{}%", s);
-        let st = if summary.is_some() && assignee_name.is_some() {
-            self.tasks_name_summary()
+        /*let st = if summary.is_some() && assignee_name.is_some() {
+            cl.tasks_name_summary
         } else if summary.is_some() {
-            self.tasks_summary()
+            cl.tasks_summary
         } else if assignee_name.is_some() {
-            self.tasks_name()
+            cl.tasks_name
         } else {
-            self.tasks()
-        };
+            cl.tasks
+        };*/
         let query = async move {
             if summary.is_some() && assignee_name.is_some() {
                 let summary = like(summary.unwrap());
                 let assignee_name = like(assignee_name.unwrap());
-                cl.query(&st, &[&summary, &assignee_name]).await
+                cl.conn.query(&cl.tasks_name_summary, &[&summary, &assignee_name]).await
             } else if summary.is_some() {
                 let summary = like(summary.unwrap());
-                cl.query(&st, &[&summary]).await
+                cl.conn.query(&cl.tasks_summary, &[&summary]).await
             } else if assignee_name.is_some() {
                 let assignee_name = like(assignee_name.unwrap());
-                cl.query(&st, &[&assignee_name]).await
+                cl.conn.query(&cl.tasks_name, &[&assignee_name]).await
             } else {
-                cl.query(&st, &[]).await
+                cl.conn.query(&cl.tasks, &[]).await
             }
         };
 

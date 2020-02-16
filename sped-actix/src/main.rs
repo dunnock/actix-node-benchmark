@@ -42,6 +42,8 @@ async fn filldb(
         .map_err(Error::from)
 }
 
+const POOL_SIZE: usize = 5;
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let db_host = std::env::var("DB_HOST").unwrap_or("localhost".to_owned());
@@ -57,7 +59,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let db_url = db_url.clone();
         App::new()
-            .data_factory(move || PgConnection::connect(db_url.clone()))
+            .data_factory(move || PgConnection::connect(db_url.clone(), POOL_SIZE))
             .service(get_task)
             .service(filter_tasks)
             .service(filldb)

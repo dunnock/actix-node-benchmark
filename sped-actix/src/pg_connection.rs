@@ -1,15 +1,22 @@
 use actix::{Actor, Addr, Context};
-use std::io;
 use tokio_postgres::{connect, Client, NoTls, Statement};
+use std::rc::Rc;
 
 /// Postgres interface
 pub struct PgConnection {
-    cl: Client,
-    task: Statement,
-    tasks: Statement,
-    tasks_name: Statement,
-    tasks_summary: Statement,
-    tasks_name_summary: Statement,
+	clients: Vec<Rc<PreparedClient>>,
+	current: usize,
+	pool: usize
+}
+
+/// Client connection with preparted statements
+pub struct PreparedClient {
+    pub conn: Client,
+    pub task: Statement,
+    pub tasks: Statement,
+    pub tasks_name: Statement,
+    pub tasks_summary: Statement,
+    pub tasks_name_summary: Statement,
 }
 
 impl Actor for PgConnection {
@@ -17,47 +24,58 @@ impl Actor for PgConnection {
 }
 
 impl PgConnection {
-    pub async fn connect(db_url: String) -> Result<Addr<PgConnection>, io::Error> {
-        let (cl, conn) = connect(db_url.as_str(), NoTls)
-            .await
-            .expect("can not connect to postgresql");
-        actix_rt::spawn(async move {
-            if let Err(e) = conn.await {
-                eprintln!("connection error: {}", e);
-            }
-        });
+    pub async fn connect(db_url: String, pool: usize) -> Result<Addr<PgConnection>, tokio_postgres::error::Error> {
+		let mut clients = Vec::new();
+		for _ in 0..pool {
+			let (cl, conn) = connect(db_url.as_str(), NoTls).await?;
+			actix_rt::spawn(async move {
+				if let Err(e) = conn.await {
+					eprintln!("connection error: {}", e);
+				}
+			});
+			clients.push(Rc::new(PreparedClient::init(cl).await?));
+		}
 
+        Ok(PgConnection::create(move |_| PgConnection { clients, current: 0, pool }))
+	}
+
+	pub fn client(&mut self) -> Rc<PreparedClient> {
+		self.current = (self.current + 1) % self.pool;
+		self.clients[self.current].clone()
+	}
+}
+
+impl PreparedClient {
+    pub async fn init(conn: Client) -> Result<Self, tokio_postgres::error::Error> {
         let query = |q: &str| {
             format!("SELECT tasks.id, tasks.summary, tasks.description, assignee.id, assignee.name FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id {}", q)
         };
 
-        let task = cl.prepare(&query("WHERE tasks.id = $1")).await.unwrap();
+        let task = conn.prepare(&query("WHERE tasks.id = $1")).await?;
 
-        let tasks = cl.prepare(&query("")).await.unwrap();
-        let tasks_name = cl
+        let tasks = conn.prepare(&query("")).await?;
+        let tasks_name = conn
             .prepare(&query("WHERE assignee.name LIKE $1"))
-            .await
-            .unwrap();
-        let tasks_summary = cl.prepare(&query("WHERE summary LIKE $1")).await.unwrap();
-        let tasks_name_summary = cl
+            .await?;
+        let tasks_summary = conn.prepare(&query("WHERE summary LIKE $1")).await?;
+        let tasks_name_summary = conn
             .prepare(&query(
                 "WHERE assignee.name LIKE $1 AND summary LIKE $2",
             ))
-            .await
-            .unwrap();
+            .await?;
 
-        Ok(PgConnection::create(move |_| PgConnection {
-            cl,
+        Ok(Self {
+            conn,
             task,
             tasks,
             tasks_name,
             tasks_summary,
             tasks_name_summary,
-        }))
+        })
 	}
-	
+
 	pub fn client(&self) -> Client {
-		self.cl.clone()
+		self.conn.clone()
 	}
 
 	pub fn task(&self) -> Statement {

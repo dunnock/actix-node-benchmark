@@ -15,9 +15,9 @@ impl Handler<GetTask> for PgConnection {
     type Result = ResponseFuture<Result<Task, io::Error>>;
 
     fn handle(&mut self, msg: GetTask, _: &mut Self::Context) -> Self::Result {
-        let get_task = self
-            .client()
-            .query_one(&self.task(), &[&msg.0])
+		let cl = self.client();
+        let get_task = cl.conn
+            .query_one(&cl.task, &[&msg.0])
             .map(|res| match res {
                 Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{:?}", e))),
                 Ok(row) => Ok(Task {
