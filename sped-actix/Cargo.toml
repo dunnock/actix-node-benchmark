@@ -24,3 +24,5 @@ tokio-postgres = { git="https://github.com/fafhrd91/rust-postgres.git" }
 bytes = "0.5"
 futures = "0.3"
 tokio = { version = "0.2", features = ["time"] }
+rand = { version = "0.6" }
+lipsum = "0.6"

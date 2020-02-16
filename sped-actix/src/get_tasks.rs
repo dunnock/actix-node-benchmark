@@ -2,10 +2,9 @@ use std::io;
 
 use futures::FutureExt;
 
+use super::{PgConnection, Task};
 use actix::{Handler, Message, ResponseFuture};
-use serde::{Deserialize};
-use super::{Task, PgConnection};
-
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct GetTasks {
@@ -21,12 +20,7 @@ impl Handler<GetTasks> for PgConnection {
     type Result = ResponseFuture<Result<Vec<Task>, io::Error>>;
 
     fn handle(
-        &mut self,
-        GetTasks {
-            summary,
-            assignee_name,
-        }: GetTasks,
-        _: &mut Self::Context,
+        &mut self, GetTasks { summary, assignee_name }: GetTasks, _: &mut Self::Context,
     ) -> Self::Result {
         let cl = self.cl.clone();
         let st = if summary.is_some() && assignee_name.is_some() {

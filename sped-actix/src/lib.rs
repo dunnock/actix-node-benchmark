@@ -1,4 +1,4 @@
-use serde::{Serialize};
+use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct Task {
@@ -17,3 +17,6 @@ pub use get_task::GetTask;
 
 mod get_tasks;
 pub use get_tasks::GetTasks;
+
+mod create_tasks;
+pub use create_tasks::CreateTasks;

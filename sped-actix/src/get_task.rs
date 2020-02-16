@@ -2,9 +2,8 @@ use std::io;
 
 use futures::FutureExt;
 
+use super::{PgConnection, Task};
 use actix::{Handler, Message, ResponseFuture};
-use super::{Task, PgConnection};
-
 
 pub struct GetTask(pub u32);
 

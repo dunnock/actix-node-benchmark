@@ -1,18 +1,45 @@
-use actix_web::{get, web, App, HttpServer, Responder, Error};
-use sped_actix::{PgConnection, GetTask, GetTasks};
-use actix::{Addr};
-use tokio::time::delay_for;
+use actix::Addr;
+use actix_web::{get, post, web, App, Error, HttpServer, Responder};
+use sped_actix::{CreateTasks, GetTask, GetTasks, PgConnection};
 use std::time::Duration;
-use tokio_postgres::{NoTls};
+use tokio::time::delay_for;
+use tokio_postgres::NoTls;
 
+/// Get task data by id
+/// Return 404 if no task found
 #[get("/tasks/{id}")]
 async fn get_task(params: web::Path<u32>, db: web::Data<Addr<PgConnection>>) -> impl Responder {
-    db.send(GetTask(params.into_inner())).await?.map(web::Json).map_err(Error::from)
+    db.send(GetTask(params.into_inner()))
+        .await?
+        .map(web::Json)
+        .map_err(Error::from)
 }
 
+/// Get tasks data matching criteria:
+/// - assignee_name LIKE ..
+/// - summary LIKE ..
 #[get("/tasks")]
-async fn filter_tasks(web::Query(get_tasks): web::Query<GetTasks>, db: web::Data<Addr<PgConnection>>) -> impl Responder {
-    db.send(get_tasks).await?.map(web::Json).map_err(Error::from)
+async fn filter_tasks(
+    web::Query(get_tasks): web::Query<GetTasks>,
+    db: web::Data<Addr<PgConnection>>,
+) -> impl Responder {
+    db.send(get_tasks)
+        .await?
+        .map(web::Json)
+        .map_err(Error::from)
+}
+
+/// Fill database with random records
+/// POST /actions/filldb?tasks=<N>&workers=<M>
+#[post("/actions/filldb")]
+async fn filldb(
+    web::Query(create_tasks): web::Query<CreateTasks>,
+    db: web::Data<Addr<PgConnection>>,
+) -> impl Responder {
+    db.send(create_tasks)
+        .await?
+        .map(web::Json)
+        .map_err(Error::from)
 }
 
 #[actix_rt::main]
