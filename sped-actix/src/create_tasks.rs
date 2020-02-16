@@ -53,7 +53,7 @@ impl Handler<CreateTasks> for PgConnection {
             writer.finish().await?;
 
             // Copy in tasks
-            let tasks_sink = cl.copy_in("COPY tasks (id, summary, description, ) FROM STDIN BINARY").await?;
+            let tasks_sink = cl.copy_in("COPY tasks (id, summary, description, assignee_id) FROM STDIN BINARY").await?;
             let writer = BinaryCopyInWriter::new(tasks_sink, &[Type::INT4, Type::VARCHAR, Type::VARCHAR, Type::INT4]);
             pin_mut!(writer);
             for task in tasks_data {
