@@ -35,13 +35,13 @@ impl PgConnection {
 
         let tasks = cl.prepare(&query("")).await.unwrap();
         let tasks_name = cl
-            .prepare(&query("WHERE assignee.name LIKE '$1'"))
+            .prepare(&query("WHERE assignee.name LIKE $1"))
             .await
             .unwrap();
-        let tasks_summary = cl.prepare(&query("WHERE summary LIKE '$1'")).await.unwrap();
+        let tasks_summary = cl.prepare(&query("WHERE summary LIKE $1")).await.unwrap();
         let tasks_name_summary = cl
             .prepare(&query(
-                "WHERE assignee.name LIKE '$1' AND summary LIKE '$1'",
+                "WHERE assignee.name LIKE $1 AND summary LIKE $2",
             ))
             .await
             .unwrap();

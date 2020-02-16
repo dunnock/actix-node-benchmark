@@ -22,7 +22,8 @@ impl Handler<GetTasks> for PgConnection {
     fn handle(
         &mut self, GetTasks { summary, assignee_name }: GetTasks, _: &mut Self::Context,
     ) -> Self::Result {
-        let cl = self.cl.clone();
+		let cl = self.cl.clone();
+		let like = |s| format!("%{}%", s);
         let st = if summary.is_some() && assignee_name.is_some() {
             self.tasks_name_summary.clone()
         } else if summary.is_some() {
@@ -34,21 +35,19 @@ impl Handler<GetTasks> for PgConnection {
         };
         let query = async move {
             if summary.is_some() && assignee_name.is_some() {
-                let summary = summary.unwrap().clone();
-                let assignee_name = assignee_name.unwrap().clone();
+                let summary = like(summary.unwrap());
+                let assignee_name = like(assignee_name.unwrap());
                 cl.query(&st, &[&summary, &assignee_name]).await
             } else if summary.is_some() {
-                let summary = summary.unwrap().clone();
+                let summary = like(summary.unwrap());
                 cl.query(&st, &[&summary]).await
             } else if assignee_name.is_some() {
-                let assignee_name = assignee_name.unwrap().clone();
+                let assignee_name = like(assignee_name.unwrap());
                 cl.query(&st, &[&assignee_name]).await
             } else {
                 cl.query(&st, &[]).await
             }
         };
-        //	.await
-        //};
 
         let get_tasks = query.map(|res| match res {
             Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{:?}", e))),
