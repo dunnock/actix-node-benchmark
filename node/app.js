@@ -2,7 +2,7 @@ const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
 
-var debug = require('debug')('app4');
+var debug = require('debug')('app');
 
 const indexRouter = require('./routes/index')
 
