@@ -24,17 +24,16 @@ async function get_task(id, res) {
 }
 
 function get_tasks(params, offset, res) {
+	let query = db.get_tasks();
 
-	let query = function (builder) {
-		if (!!params["assignee_name"]) {
-			builder.where("assignee.name", "LIKE", "%" + params["assignee_name"] + "%")
-		}
-		if (!!params["summary"]) {
-			builder.where("summary", "LIKE", "%" + params["summary"] + "%")
-		}
-	};
+	if (!!params["assignee_name"]) {
+		query.where("assignee.name", "LIKE", "%" + params["assignee_name"] + "%")
+	}
+	if (!!params["summary"]) {
+		query.where("summary", "LIKE", "%" + params["summary"] + "%")
+	}
 
-	db.get_tasks(query).offset(offset).limit(20).then(rows => {
+	query.then(rows => {
 		res.send(rows)
 	})
 	.catch(err => {throw err})
