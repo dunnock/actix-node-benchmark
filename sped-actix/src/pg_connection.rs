@@ -4,12 +4,12 @@ use tokio_postgres::{connect, Client, NoTls, Statement};
 
 /// Postgres interface
 pub struct PgConnection {
-    pub(crate) cl: Client,
-    pub(crate) task: Statement,
-    pub(crate) tasks: Statement,
-    pub(crate) tasks_name: Statement,
-    pub(crate) tasks_summary: Statement,
-    pub(crate) tasks_name_summary: Statement,
+    cl: Client,
+    task: Statement,
+    tasks: Statement,
+    tasks_name: Statement,
+    tasks_summary: Statement,
+    tasks_name_summary: Statement,
 }
 
 impl Actor for PgConnection {
@@ -54,5 +54,29 @@ impl PgConnection {
             tasks_summary,
             tasks_name_summary,
         }))
-    }
+	}
+	
+	pub fn client(&self) -> Client {
+		self.cl.clone()
+	}
+
+	pub fn task(&self) -> Statement {
+		self.task.clone()
+	}
+
+	pub fn tasks(&self) -> Statement {
+		self.tasks.clone()
+	}
+
+	pub fn tasks_name(&self) -> Statement {
+		self.tasks_name.clone()
+	}
+
+	pub fn tasks_summary(&self) -> Statement {
+		self.tasks_summary.clone()
+	}
+
+	pub fn tasks_name_summary(&self) -> Statement {
+		self.tasks_name_summary.clone()
+	}
 }

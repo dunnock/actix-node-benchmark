@@ -33,7 +33,7 @@ impl Handler<CreateTasks> for PgConnection {
     fn handle(
         &mut self, CreateTasks { tasks, workers }: CreateTasks, _: &mut Self::Context,
     ) -> Self::Result {
-        let cl = self.cl.clone();
+        let cl = self.client();
 
         let mut rng = SmallRng::from_entropy();
         let mut gen_text = MarkovChain::new_with_rng(SmallRng::from_entropy());

@@ -16,8 +16,8 @@ impl Handler<GetTask> for PgConnection {
 
     fn handle(&mut self, msg: GetTask, _: &mut Self::Context) -> Self::Result {
         let get_task = self
-            .cl
-            .query_one(&self.task, &[&msg.0])
+            .client()
+            .query_one(&self.task(), &[&msg.0])
             .map(|res| match res {
                 Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{:?}", e))),
                 Ok(row) => Ok(Task {
