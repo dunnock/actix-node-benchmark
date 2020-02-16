@@ -21,3 +21,5 @@ router.get('/tasks', (req, res) => {
 	};
 	get_tasks(query, req.query.offset || 0, res);
 })
+
+module.exports = router
