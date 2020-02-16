@@ -114,8 +114,10 @@ impl Task {
         let assignee = &workers[rng.next_u32() as usize % workers.len()];
         let assignee_id = assignee.id;
         let mut summary: String = assignee.name.clone();
+        summary.push(' ');
         summary.push_str(gen_text.generate(rng.next_u32() as usize % 10).as_str());
         let mut description = summary.clone();
+        description.push(' ');
         description.push_str(gen_text.generate(rng.next_u32() as usize % 1000).as_str());
         Task {
             id,
