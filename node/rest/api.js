@@ -23,14 +23,21 @@ async function get_task(id, res) {
 	})
 }
 
-function get_tasks(query, offset, res) {
+function get_tasks(params, offset, res) {
+
+	let query = function (builder) {
+		if (!!params["assignee_name"]) {
+			builder.where("assignee.name", "LIKE", "%" + params["assignee_name"] + "%")
+		}
+		if (!!params["summary"]) {
+			builder.where("summary", "LIKE", "%" + params["summary"] + "%")
+		}
+	};
 
 	db.get_tasks(query).offset(offset).limit(20).then(rows => {
 		res.send(rows)
 	})
-		.catch(err => {throw err})
-
-	res.send(db.get_tasks(query));
+	.catch(err => {throw err})
 }
 
 module.exports = {

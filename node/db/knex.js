@@ -2,9 +2,9 @@ module.exports = require('knex')({
 	client: 'pg',
 	connection: {
 		host : process.env.DB_HOST,
-		user : 'db_user',
-		password : 'admin',
-		database : 'db'
+		user : 'sped',
+		password : 'sped',
+		database : 'sped'
 	},
 	pool: {
 		min: 2,
