@@ -47,11 +47,13 @@ const POOL_SIZE: usize = 5;
 /// Main test server, configurable via env variables:
 /// DB_HOST - host name of PostgreSQL DB
 /// WORKERS - number of workers (busy CPU cores)
+/// POOL_SIZE - number of DB connections per worker (busy Postgres cores)
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let db_host = std::env::var("DB_HOST").unwrap_or("localhost".to_owned());
     let db_url = format!("postgres://sped:sped@{}:5432/sped", db_host);
     let workers: usize = std::env::var("WORKERS").unwrap_or("1".to_owned()).parse().unwrap();
+    let pool_size: usize = std::env::var("POOL_SIZE").unwrap_or("10".to_owned()).parse().unwrap();
 
     while let Err(err) = tokio_postgres::connect(db_url.as_str(), NoTls).await {
         println!("Failed connection to PostgreSQ {}", err);
@@ -62,7 +64,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let db_url = db_url.clone();
         App::new()
-            .data_factory(move || PgConnection::connect(db_url.clone(), POOL_SIZE))
+            .data_factory(move || PgConnection::connect(db_url.clone(), pool_size))
             .service(get_task)
             .service(filter_tasks)
             .service(filldb)
