@@ -44,6 +44,9 @@ async fn filldb(
 
 const POOL_SIZE: usize = 5;
 
+/// Main test server, configurable via env variables:
+/// DB_HOST - host name of PostgreSQL DB
+/// WORKERS - number of workers (busy CPU cores)
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let db_host = std::env::var("DB_HOST").unwrap_or("localhost".to_owned());
