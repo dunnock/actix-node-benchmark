@@ -44,10 +44,6 @@ impl PgConnection {
 
 impl PreparedClient {
     pub async fn init(conn: Client) -> Result<Self, tokio_postgres::error::Error> {
-        let query = |q: &str| {
-            format!("SELECT tasks.id, tasks.summary, assignee.id, assignee.name FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id {}", q)
-        };
-
         let task = conn.prepare(
 			"SELECT tasks.id, tasks.summary, assignee.id, assignee.name 
 			FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
