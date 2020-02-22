@@ -1,0 +1,9 @@
+threads: 4
+base: 'http://localhost:3001'
+iterations: 5
+rampup: 2
+
+plan:
+  - name: Get Fat Tasks
+    request:
+      url: /tasks?limit=10
