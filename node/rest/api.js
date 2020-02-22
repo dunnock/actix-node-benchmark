@@ -32,6 +32,7 @@ function get_tasks(params, offset, res) {
 	if (!!params["summary"]) {
 		query.where("summary", "LIKE", "%" + params["summary"] + "%")
 	}
+	query.limit(params["limit"] || 10);
 
 	query.then(rows => {
 		res.send(rows)
