@@ -1,5 +1,5 @@
 use actix::{Actor, Addr, Context};
-use tokio_postgres::{connect, Client, NoTls, Statement};
+use tokio_postgres::{connect, Client, NoTls, Statement, types::Type};
 use std::rc::Rc;
 
 /// Postgres interface
@@ -45,13 +45,21 @@ impl PgConnection {
 impl PreparedClient {
     pub async fn init(conn: Client) -> Result<Self, tokio_postgres::error::Error> {
         let query = |q: &str| {
-            format!("SELECT tasks.id, tasks.summary, tasks.description, assignee.id, assignee.name FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id {}", q)
+            format!("SELECT tasks.id, tasks.summary, assignee.id, assignee.name FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id {}", q)
         };
 
-        let task = conn.prepare(&query("WHERE tasks.id = $1")).await?;
+        let task = conn.prepare(
+			"SELECT tasks.id, tasks.summary, assignee.id, assignee.name 
+			FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
+			WHERE tasks.id = $1"
+		).await?;
 
-        let tasks = conn.prepare(
-			&query("WHERE ($1 is null or assignee.name LIKE $1) or ($2 is null or summary LIKE $2) LIMIT $3")).await?;
+        let tasks = conn.prepare_typed(
+			"SELECT tasks.id, tasks.summary, assignee.id, assignee.name 
+			FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
+			WHERE ($1 is null or assignee.name LIKE $1) or ($2 is null or summary LIKE $2) LIMIT $3",
+			&[Type::VARCHAR, Type::VARCHAR, Type::OID]
+		).await?;
 
         Ok(Self {
             conn,

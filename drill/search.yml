@@ -1,9 +1,9 @@
 threads: 4
-base: 'http://localhost:3001'
-iterations: 5
+base: 'http://127.0.0.1:3001'
+iterations: 50
 rampup: 2
 
 plan:
   - name: Get Fat Tasks
     request:
-      url: /tasks?limit=10
+      url: /tasks

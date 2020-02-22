@@ -35,7 +35,7 @@ function get_tasks(params, offset, res) {
 	query.limit(params["limit"] || 10);
 
 	query.then(rows => {
-		res.send(rows)
+		res.send(rows.map((row) => Object.assign(row, {description: null})))
 	})
 	.catch(err => {throw err})
 }

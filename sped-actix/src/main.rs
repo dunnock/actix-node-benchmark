@@ -48,6 +48,8 @@ async fn filldb(
 /// POOL_SIZE - number of DB connections per worker (busy Postgres cores)
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init();
+
     let db_host = std::env::var("DB_HOST").unwrap_or("localhost".to_owned());
     let db_url = format!("postgres://sped:sped@{}:5432/sped", db_host);
     let workers: usize = std::env::var("WORKERS").unwrap_or("1".to_owned()).parse().unwrap();
