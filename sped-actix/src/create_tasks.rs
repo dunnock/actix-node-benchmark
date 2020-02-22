@@ -11,8 +11,8 @@ use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 use futures::{pin_mut};
 use lipsum::MarkovChain;
 
-static FNAMES: [&str; 4946] = include!("texts/first-names.json");
-static LNAMES: [&str; 21986] = include!("texts/names.json");
+static FNAMES: [&str; 300] = include!("texts/fnames.json");
+static LNAMES: [&str; 300] = include!("texts/lnames.json");
 static DIALOGUES: &str = include!("texts/ring.txt");
 
 /// Create N tasks assigned to M workers
@@ -82,9 +82,9 @@ struct Worker {
 
 impl Worker {
     pub fn gen(id: i32, rng: &mut impl RngCore) -> Self {
-        let mut name: String = FNAMES[(rng.next_u32() as usize % 100) * 10].to_string();
+        let mut name: String = FNAMES[rng.next_u32() as usize % 300].to_string();
         name.push(' ');
-        name.push_str(LNAMES[(rng.next_u32() as usize % 100) * 10]);
+        name.push_str(LNAMES[rng.next_u32() as usize % 300]);
         let mut email = name.replace(" ", ".");
         email.push_str("@gmail.com");
         Worker {

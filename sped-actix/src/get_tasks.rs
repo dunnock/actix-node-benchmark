@@ -28,6 +28,7 @@ impl Handler<GetTasks> for PgConnection {
         let query = async move {
             let assignee_name = like(assignee_name);
             let summary = like(summary);
+            let limit = limit.unwrap_or(10);
             cl.conn.query(&cl.tasks, &[&assignee_name, &summary, &limit]).await
         };
 
