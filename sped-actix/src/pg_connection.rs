@@ -14,9 +14,6 @@ pub struct PreparedClient {
     pub conn: Client,
     pub task: Statement,
     pub tasks: Statement,
-    pub tasks_name: Statement,
-    pub tasks_summary: Statement,
-    pub tasks_name_summary: Statement,
 }
 
 impl Actor for PgConnection {
@@ -53,24 +50,13 @@ impl PreparedClient {
 
         let task = conn.prepare(&query("WHERE tasks.id = $1")).await?;
 
-        let tasks = conn.prepare(&query("")).await?;
-        let tasks_name = conn
-            .prepare(&query("WHERE assignee.name LIKE $1"))
-            .await?;
-        let tasks_summary = conn.prepare(&query("WHERE summary LIKE $1")).await?;
-        let tasks_name_summary = conn
-            .prepare(&query(
-                "WHERE assignee.name LIKE $1 AND summary LIKE $2",
-            ))
-            .await?;
+        let tasks = conn.prepare(
+			&query("WHERE ($1 is null or assignee.name LIKE $1) or ($2 is null or summary LIKE $2) LIMIT $3")).await?;
 
         Ok(Self {
             conn,
             task,
             tasks,
-            tasks_name,
-            tasks_summary,
-            tasks_name_summary,
         })
 	}
 
@@ -84,17 +70,5 @@ impl PreparedClient {
 
 	pub fn tasks(&self) -> Statement {
 		self.tasks.clone()
-	}
-
-	pub fn tasks_name(&self) -> Statement {
-		self.tasks_name.clone()
-	}
-
-	pub fn tasks_summary(&self) -> Statement {
-		self.tasks_summary.clone()
-	}
-
-	pub fn tasks_name_summary(&self) -> Statement {
-		self.tasks_name_summary.clone()
 	}
 }

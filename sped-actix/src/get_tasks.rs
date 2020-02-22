@@ -10,6 +10,7 @@ use serde::Deserialize;
 pub struct GetTasks {
     summary: Option<String>,
     assignee_name: Option<String>,
+    limit: Option<u32>
 }
 
 impl Message for GetTasks {
@@ -20,33 +21,14 @@ impl Handler<GetTasks> for PgConnection {
     type Result = ResponseFuture<Result<Vec<Task>, io::Error>>;
 
     fn handle(
-        &mut self, GetTasks { summary, assignee_name }: GetTasks, _: &mut Self::Context,
+        &mut self, GetTasks { summary, assignee_name, limit }: GetTasks, _: &mut Self::Context,
     ) -> Self::Result {
 		let cl = self.client();
-		let like = |s| format!("%{}%", s);
-        /*let st = if summary.is_some() && assignee_name.is_some() {
-            cl.tasks_name_summary
-        } else if summary.is_some() {
-            cl.tasks_summary
-        } else if assignee_name.is_some() {
-            cl.tasks_name
-        } else {
-            cl.tasks
-        };*/
+		let like = |s: Option<String>| s.map(|s| format!("%{}%", s));
         let query = async move {
-            if summary.is_some() && assignee_name.is_some() {
-                let summary = like(summary.unwrap());
-                let assignee_name = like(assignee_name.unwrap());
-                cl.conn.query(&cl.tasks_name_summary, &[&summary, &assignee_name]).await
-            } else if summary.is_some() {
-                let summary = like(summary.unwrap());
-                cl.conn.query(&cl.tasks_summary, &[&summary]).await
-            } else if assignee_name.is_some() {
-                let assignee_name = like(assignee_name.unwrap());
-                cl.conn.query(&cl.tasks_name, &[&assignee_name]).await
-            } else {
-                cl.conn.query(&cl.tasks, &[]).await
-            }
+            let assignee_name = like(assignee_name);
+            let summary = like(summary);
+            cl.conn.query(&cl.tasks, &[&assignee_name, &summary, &limit]).await
         };
 
         let get_tasks = query.map(|res| match res {
@@ -56,9 +38,9 @@ impl Handler<GetTasks> for PgConnection {
                 .map(|row| Task {
                     id: row.get(0),
                     summary: row.get(1),
-                    description: row.get(2),
-                    assignee_id: row.get(3),
-                    assignee_name: row.get(4),
+                    assignee_id: row.get(2),
+                    assignee_name: row.get(3),
+                    description: None
                 })
                 .collect()),
         });

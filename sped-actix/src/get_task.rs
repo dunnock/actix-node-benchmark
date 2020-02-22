@@ -23,7 +23,7 @@ impl Handler<GetTask> for PgConnection {
                 Ok(row) => Ok(Task {
                     id: row.get(0),
                     summary: row.get(1),
-                    description: row.get(2),
+                    description: Some(row.get(2)),
                     assignee_id: row.get(3),
                     assignee_name: row.get(4),
                 }),

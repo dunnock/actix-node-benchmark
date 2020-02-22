@@ -4,7 +4,7 @@ use serde::Serialize;
 pub struct Task {
     id: i32,
     summary: String,
-    description: String,
+    description: Option<String>,
     assignee_id: i32,
     assignee_name: String,
 }

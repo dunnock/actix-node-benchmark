@@ -1582,6 +1582,7 @@ dependencies = [
  "lipsum",
  "rand 0.6.5",
  "serde",
+ "serde_json",
  "tokio",
  "tokio-postgres",
 ]
