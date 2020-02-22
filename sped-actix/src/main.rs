@@ -42,8 +42,6 @@ async fn filldb(
         .map_err(Error::from)
 }
 
-const POOL_SIZE: usize = 5;
-
 /// Main test server, configurable via env variables:
 /// DB_HOST - host name of PostgreSQL DB
 /// WORKERS - number of workers (busy CPU cores)
