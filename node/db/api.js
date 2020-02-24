@@ -10,7 +10,7 @@ function get_task(id) {
 }
 
 function get_tasks() {
-	return tasks().select('tasks.id', 'tasks.summary', 'assignee.id as assignee_id', 'assignee.name');
+	return tasks().select('tasks.id', 'tasks.summary', 'assignee.id', 'assignee.name');
 }
 
 module.exports = {

@@ -35,7 +35,13 @@ function get_tasks(params, offset, res) {
 	query.limit(params["limit"] || 10);
 
 	query.then(rows => {
-		res.send(rows.map((row) => Object.assign(row, {description: null})))
+		res.send(rows.map((row) => {
+			id: row['tasks.id'],
+			summary: row['tasks.summary'], 
+			assignee_id: row['assignee.id'], 
+			assignee_name: row['assignee.name'],
+			description: null
+		}))
 	})
 	.catch(err => {throw err})
 }
