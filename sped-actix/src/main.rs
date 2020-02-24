@@ -55,12 +55,14 @@ async fn main() -> std::io::Result<()> {
     let workers: usize = std::env::var("WORKERS").unwrap_or("1".to_owned()).parse().unwrap();
     let pool_size: usize = std::env::var("POOL_SIZE").unwrap_or("10".to_owned()).parse().unwrap();
 
+    // wait for postgres server to start
     while let Err(err) = tokio_postgres::connect(db_url.as_str(), NoTls).await {
         println!("Failed connection to PostgreSQ {}", err);
         delay_for(Duration::from_millis(1_000)).await;
         println!("Retrying connection to PostgreSQL...");
     }
 
+    // start HTTP server on port 3001
     HttpServer::new(move || {
         let db_url = db_url.clone();
         App::new()
