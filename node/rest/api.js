@@ -1,30 +1,27 @@
 const db = require('../db/api.js');
-const redis = require('redis')
-const cache = redis.createClient(6379, process.env.REDIS_HOST)
 
 async function get_task(id, res) {
-	cache.hget(`tasks:${id}`, function (err, task) {
-		if (err) {
-			console.log('Cache::get_task error ' + err)
-			res.send(db.get_task(id));
-		} else {
-			if (task) {
-				res.send(task);
+	db.get_task(id)
+		.then((rows) => {
+			if (rows.length == 1) {
+				res.send({
+					id: row[0]['tasks.id'],
+					summary: row[0]['tasks.summary'], 
+					assignee_id: row[0]['assignee.id'], 
+					assignee_name: row[0]['assignee.name'],
+					description: row[0]['tasks.description']
+				});
 			} else {
-				task = db.get_task(id);
-				if (task) {
-					cache.set(id, task);
-					res.send(task);
-				} else {
-					res.status(404).send("Task not found");
-				}
+				res.status(404).send("Task not found");
 			}
-		}
-	})
+		})
+		.catch(err => {throw err})
 }
 
 function get_tasks(params, offset, res) {
-	let query = db.get_tasks();
+	let query = (params["full"] == "true")
+		? db.get_tasks_with_description()
+		: db.get_tasks();
 
 	if (!!params["assignee_name"]) {
 		query.where("assignee.name", "LIKE", "%" + params["assignee_name"] + "%")
@@ -40,7 +37,7 @@ function get_tasks(params, offset, res) {
 			summary: row['tasks.summary'], 
 			assignee_id: row['assignee.id'], 
 			assignee_name: row['assignee.name'],
-			description: null
+			description: (params["full"] == "true") ? row['tasks.description'] : null
 		})))
 	})
 	.catch(err => {throw err})

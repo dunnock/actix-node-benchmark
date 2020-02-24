@@ -13,6 +13,10 @@ function get_tasks() {
 	return tasks().select('tasks.id', 'tasks.summary', 'assignee.id', 'assignee.name');
 }
 
+function get_tasks_with_description() {
+	return tasks().select('tasks.id', 'tasks.summary', 'tasks.description', 'assignee.id', 'assignee.name');
+}
+
 module.exports = {
 	get_task,
 	get_tasks
