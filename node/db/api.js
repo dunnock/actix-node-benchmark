@@ -19,5 +19,6 @@ function get_tasks_with_description() {
 
 module.exports = {
     get_task,
-    get_tasks
+    get_tasks,
+    get_tasks_with_description
 };
