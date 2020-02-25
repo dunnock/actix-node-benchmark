@@ -54,14 +54,14 @@ impl PreparedClient {
         let tasks = conn.prepare_typed(
             "SELECT tasks.id, tasks.summary, assignee.id, assignee.name 
             FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
-            WHERE ($1 is null or assignee.name LIKE $1) or ($2 is null or summary LIKE $2) LIMIT $3",
+            WHERE ($1 is null or assignee.name LIKE $1) AND ($2 is null or summary LIKE $2) LIMIT $3",
             &[Type::VARCHAR, Type::VARCHAR, Type::OID]
         ).await?;
 
         let tasks_full = conn.prepare_typed(
             "SELECT tasks.id, tasks.summary, assignee.id, assignee.name, tasks.description
             FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
-            WHERE ($1 is null or assignee.name LIKE $1) or ($2 is null or summary LIKE $2) LIMIT $3",
+            WHERE ($1 is null or assignee.name LIKE $1) AND ($2 is null or summary LIKE $2) LIMIT $3",
             &[Type::VARCHAR, Type::VARCHAR, Type::OID]
         ).await?;
 
