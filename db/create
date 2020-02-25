@@ -1,30 +1,30 @@
 CREATE TABLE workers (
-	id SERIAL PRIMARY KEY,
-	name varchar(255) NOT NULL,
-	email varchar(255) NULL,
-	score integer DEFAULT 0
+    id SERIAL PRIMARY KEY,
+    name varchar(255) NOT NULL,
+    email varchar(255) NULL,
+    score integer DEFAULT 0
 );
 
 CREATE TABLE tasks (
-	id SERIAL PRIMARY KEY,
-	summary varchar(255) NOT NULL,
-	description text NOT NULL,
-	assignee_id integer NULL REFERENCES workers,
-	created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    summary varchar(255) NOT NULL,
+    description text NOT NULL,
+    assignee_id integer NULL REFERENCES workers,
+    created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS tasks_search_summary ON tasks (
-	summary
+    summary
 );
 
 CREATE INDEX IF NOT EXISTS tasks_search_assignee ON tasks (
-	assignee_id
+    assignee_id
 );
 
 CREATE INDEX IF NOT EXISTS workers_search_name ON workers (
-	name
+    name
 );
 
 CREATE INDEX IF NOT EXISTS workers_search_email ON workers (
-	email
+    email
 );
