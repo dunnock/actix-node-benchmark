@@ -31,13 +31,14 @@ function get_tasks(params, offset, res) {
     }
     query.limit(params["limit"] || 10);
 
-    query.then(rows => {
+    query.then(rows => { console.log(rows); return rows })
+        .then(rows => {
         res.send(rows.map((row) => ({
-            id: row['tasks.id'],
-            summary: row['tasks.summary'], 
-            assignee_id: row['assignee.id'], 
-            assignee_name: row['assignee.name'],
-            description: (params["full"] == "true") ? row['tasks.description'] : null
+            id: row['id'],
+            summary: row['summary'], 
+            assignee_id: row['assignee_id'], 
+            assignee_name: row['assignee_name'],
+            description: (params["full"] == "true") ? row['description'] : null
         })))
     })
     .catch(err => {throw err})
