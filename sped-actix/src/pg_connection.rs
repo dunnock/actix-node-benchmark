@@ -13,7 +13,8 @@ pub struct PgConnection {
 pub struct PreparedClient {
     pub conn: Client,
     pub task: Statement,
-    pub tasks: Statement,
+	pub tasks: Statement,
+	pub tasks_full: Statement
 }
 
 impl Actor for PgConnection {
@@ -57,22 +58,22 @@ impl PreparedClient {
 			&[Type::VARCHAR, Type::VARCHAR, Type::OID]
 		).await?;
 
+		let tasks_full = conn.prepare_typed(
+			"SELECT tasks.id, tasks.summary, assignee.id, assignee.name, tasks.description
+			FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
+			WHERE ($1 is null or assignee.name LIKE $1) or ($2 is null or summary LIKE $2) LIMIT $3",
+			&[Type::VARCHAR, Type::VARCHAR, Type::OID]
+		).await?;
+
         Ok(Self {
             conn,
             task,
-            tasks,
+			tasks,
+			tasks_full
         })
 	}
 
 	pub fn client(&self) -> Client {
 		self.conn.clone()
-	}
-
-	pub fn task(&self) -> Statement {
-		self.task.clone()
-	}
-
-	pub fn tasks(&self) -> Statement {
-		self.tasks.clone()
 	}
 }

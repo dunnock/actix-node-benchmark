@@ -10,7 +10,8 @@ use serde::Deserialize;
 pub struct GetTasks {
     summary: Option<String>,
     assignee_name: Option<String>,
-    limit: Option<u32>
+    limit: Option<u32>,
+    full: Option<bool>
 }
 
 impl Message for GetTasks {
@@ -21,18 +22,23 @@ impl Handler<GetTasks> for PgConnection {
     type Result = ResponseFuture<Result<Vec<Task>, io::Error>>;
 
     fn handle(
-        &mut self, GetTasks { summary, assignee_name, limit }: GetTasks, _: &mut Self::Context,
+        &mut self, GetTasks { summary, assignee_name, limit, full }: GetTasks, _: &mut Self::Context,
     ) -> Self::Result {
-		let cl = self.client();
-		let like = |s: Option<String>| s.map(|s| format!("%{}%", s));
+        let cl = self.client();
+        let full = full.is_some() && full.unwrap();
+        let like = |s: Option<String>| s.map(|s| format!("%{}%", s));
         let query = async move {
             let assignee_name = like(assignee_name);
             let summary = like(summary);
             let limit = limit.unwrap_or(10);
-            cl.conn.query(&cl.tasks, &[&assignee_name, &summary, &limit]).await
+            if full {
+                cl.conn.query(&cl.tasks_full, &[&assignee_name, &summary, &limit]).await
+            } else {
+                cl.conn.query(&cl.tasks, &[&assignee_name, &summary, &limit]).await
+            }
         };
 
-        let get_tasks = query.map(|res| match res {
+        let get_tasks = query.map(move |res| match res {
             Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{:?}", e))),
             Ok(rows) => Ok(rows
                 .iter()
@@ -41,7 +47,7 @@ impl Handler<GetTasks> for PgConnection {
                     summary: row.get(1),
                     assignee_id: row.get(2),
                     assignee_name: row.get(3),
-                    description: None
+                    description: if full { Some(row.get(4)) } else { None }
                 })
                 .collect()),
         });
