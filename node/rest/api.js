@@ -31,7 +31,7 @@ function get_tasks(params, offset, res) {
     }
     query.limit(params["limit"] || 10);
 
-    query.then(rows => { console.log(rows); return rows })
+    query
         .then(rows => {
         res.send(rows.map((row) => ({
             id: row['id'],
