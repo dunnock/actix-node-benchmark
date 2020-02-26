@@ -20,7 +20,7 @@ async function get_task(id, res) {
 
 function get_tasks(params, offset, res) {
     let query = (params["full"] == "true")
-        ? db.get_tasks_with_description()
+        ? db.get_tasks_full()
         : db.get_tasks();
 
     if (!!params["assignee_name"]) {

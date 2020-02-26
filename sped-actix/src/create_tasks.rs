@@ -44,7 +44,7 @@ impl Handler<CreateTasks> for PgConnection {
 
         let fut = async move {
             // Copy in workers
-            let workers_sink = cl.conn.copy_in("COPY workers (id, name, email) FROM STDIN BINARY").await?;
+            let workers_sink = cl.conn.copy_in("COPY worker (id, name, email) FROM STDIN BINARY").await?;
             let writer = BinaryCopyInWriter::new(workers_sink, &[Type::INT4, Type::VARCHAR, Type::VARCHAR]);
             pin_mut!(writer);
             for worker in workers_data {
@@ -53,7 +53,7 @@ impl Handler<CreateTasks> for PgConnection {
             writer.finish().await?;
 
             // Copy in tasks
-            let tasks_sink = cl.conn.copy_in("COPY tasks (id, summary, description, assignee_id) FROM STDIN BINARY").await?;
+            let tasks_sink = cl.conn.copy_in("COPY task (id, summary, description, assignee_id) FROM STDIN BINARY").await?;
             let writer = BinaryCopyInWriter::new(tasks_sink, &[Type::INT4, Type::VARCHAR, Type::VARCHAR, Type::INT4]);
             pin_mut!(writer);
             for task in tasks_data {

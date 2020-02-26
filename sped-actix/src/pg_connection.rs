@@ -46,21 +46,21 @@ impl PgConnection {
 impl PreparedClient {
     pub async fn init(conn: Client) -> Result<Self, tokio_postgres::error::Error> {
         let task = conn.prepare(
-            "SELECT tasks.id, tasks.summary, assignee.id, assignee.name 
-            FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
-            WHERE tasks.id = $1"
+            "SELECT task.id, task.summary, assignee.id, assignee.name 
+            FROM task INNER JOIN worker as assignee ON assignee.id = task.assignee_id
+            WHERE task.id = $1"
         ).await?;
 
         let tasks = conn.prepare_typed(
-            "SELECT tasks.id, tasks.summary, assignee.id, assignee.name 
-            FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
+            "SELECT task.id, task.summary, assignee.id, assignee.name 
+            FROM task INNER JOIN worker as assignee ON assignee.id = task.assignee_id
             WHERE ($1 is null or assignee.name LIKE $1) AND ($2 is null or summary LIKE $2) LIMIT $3",
             &[Type::VARCHAR, Type::VARCHAR, Type::OID]
         ).await?;
 
         let tasks_full = conn.prepare_typed(
-            "SELECT tasks.id, tasks.summary, assignee.id, assignee.name, tasks.description
-            FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
+            "SELECT task.id, task.summary, assignee.id, assignee.name, task.description
+            FROM task INNER JOIN worker as assignee ON assignee.id = task.assignee_id
             WHERE ($1 is null or assignee.name LIKE $1) AND ($2 is null or summary LIKE $2) LIMIT $3",
             &[Type::VARCHAR, Type::VARCHAR, Type::OID]
         ).await?;

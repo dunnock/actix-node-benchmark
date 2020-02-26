@@ -1,6 +1,6 @@
-SELECT tasks.id, tasks.summary, tasks.description, assignee.id, assignee.name FROM tasks INNER JOIN workers as assignee ON assignee.id = tasks.assignee_id
+SELECT task.id, task.summary, task.description, assignee.id, assignee.name FROM task INNER JOIN worker as assignee ON assignee.id = task.assignee_id
 
-DELETE FROM workers;
-DELETE FROM tasks;
+DELETE FROM worker;
+DELETE FROM task;
 
-SELECT * FROM workers;
+SELECT * FROM worker;
