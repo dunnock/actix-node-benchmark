@@ -1,6 +1,6 @@
 const db = require('../db/pg.js');
 
-async function get_tasks(params, offset, res) {
+async function get_tasks(params, res) {
     let conn = (params["full"] == "true")
         ? db.get_tasks_full()
         : db.get_tasks();

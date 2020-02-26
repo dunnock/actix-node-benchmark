@@ -21,10 +21,10 @@ pub async fn get_tasks(
     query: web::Query<GetTasksQuery>,
     db_pool: web::Data<Pool>,
 ) -> Result<HttpResponse, Error> {
-	let client: Client =
-		db_pool.get().await.map_err(BenchError::PoolError)?;
+    let client: Client =
+        db_pool.get().await.map_err(BenchError::PoolError)?;
 
-	let tasks = db::get_tasks(&client, query.into_inner()).await?;
+    let tasks = db::get_tasks(&client, query.into_inner()).await?;
 
-	Ok(HttpResponse::Ok().json(tasks))
+    Ok(HttpResponse::Ok().json(tasks))
 }

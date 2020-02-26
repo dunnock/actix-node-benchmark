@@ -1,22 +1,19 @@
 const express = require('express')
 const router = express.Router()
-const { get_task, get_tasks } = require('../rest/api.js')
 const pg = require('../rest/api_pg.js')
-
-
-router.get('/tasks/:id', function(req, res) {
-    const values = []
-    const id = req.params.id;
-
-    get_task(id, res);
-})
+const db = require('../db/api.js');
 
 router.get('/tasks', (req, res) => {
-    get_tasks(req.query, req.query.offset || 0, res);
+    let { assignee_name, summary, limit, full } = req.query;
+    full = full == "true"; 
+
+    db.get_tasks(assignee_name, summary, limit, full)
+        .then(tasks => res.send(tasks))
+        .catch(err => {throw err})
 })
 
 router.get('/tasks_pg', (req, res) => {
-    pg.get_tasks(req.query, req.query.offset || 0, res);
+    pg.get_tasks(req.query, res);
 })
 
 module.exports = router
