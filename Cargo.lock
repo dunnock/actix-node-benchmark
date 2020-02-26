@@ -631,8 +631,7 @@ dependencies = [
 [[package]]
 name = "deadpool"
 version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38ce52b0b1ad88ed0b2be2bc3c65ad39dd1a5d9633b1a8a314fc017fbe0027d2"
+source = "git+https://github.com/dunnock/deadpool#d42ad4bce50219d0a24e43f994f3105c86343a18"
 dependencies = [
  "async-trait",
  "config",
@@ -645,8 +644,7 @@ dependencies = [
 [[package]]
 name = "deadpool-postgres"
 version = "0.5.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9adedc6e12b70ccd917f4918c1aa763985aae1752a084a5c192c6cc9065e65c3"
+source = "git+https://github.com/dunnock/deadpool#d42ad4bce50219d0a24e43f994f3105c86343a18"
 dependencies = [
  "async-trait",
  "config",

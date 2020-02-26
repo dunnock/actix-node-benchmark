@@ -18,9 +18,7 @@ pub struct GetTasksQuery {
 /// - full=true will return task.description
 #[get("/tasks")]
 pub async fn get_tasks( query: Query<GetTasksQuery>, db_pool: Data<Pool> ) -> Result<HttpResponse, BenchError> {
-    let client = db_pool.get().await?;
-
-    let tasks = db::get_tasks(&client, query.into_inner()).await?;
+    let tasks = db::get_tasks(db_pool.into_inner(), query.into_inner()).await?;
 
     Ok(HttpResponse::Ok().json(tasks))
 }
