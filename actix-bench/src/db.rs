@@ -2,6 +2,7 @@ use crate::{errors::BenchError, models::Task, GetTasksQuery};
 use deadpool_postgres::Client;
 use tokio_pg_mapper::FromTokioPostgresRow;
 use tokio_postgres::types::Type;
+use std::convert::TryFrom;
 
 impl GetTasksQuery {
 	pub fn is_full(&self) -> bool {
@@ -29,6 +30,6 @@ pub async fn get_tasks(client: &Client, query: GetTasksQuery) -> Result<Vec<Task
 		)
 		.await?
 		.iter()
-		.map(|row| Task::from_row_ref(row).map_err(BenchError::from))
+		.map(Task::try_from)
 		.collect()
 }
