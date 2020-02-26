@@ -1,2 +1,2 @@
 [workspace]
-members = [ "sped-actix" ]
+members = [ "actix-raw", "actix-bench" ]

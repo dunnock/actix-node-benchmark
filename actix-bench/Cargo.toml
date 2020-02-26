@@ -1,0 +1,24 @@
+[package]
+name = "actix_bench"
+version = "0.1.0"
+description = "Actix-web example microservice for benchmark"
+authors = ["Maksym Vorobiov <maxim.vorobjov@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "server"
+path = "src/main.rs"
+
+[dependencies]
+actix-web = "2.0.0"
+serde = { version = "1", features = ["derive"] }
+actix-rt = "1"
+tokio-postgres = "0.5"
+env_logger = "0.7"
+deadpool-postgres = "0.5"
+tokio-pg-mapper = { version = "0.1.4", features = ["derive"] }
+derive_more = "0.99"
+dotenv = "0.15.0"
+config = "0.10"

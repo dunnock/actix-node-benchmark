@@ -3,6 +3,6 @@ FROM rust:1.41
 WORKDIR /app
 COPY . .
 
-RUN cargo build --release --bin server
+RUN cargo build --release
 
-CMD cargo run --release --bin server
+CMD cargo run --release

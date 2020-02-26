@@ -1,15 +1,11 @@
 [package]
-name = "sped-actix"
+name = "actix_raw"
 version = "0.1.0"
-description = "Data-local web service with KVS and search"
+description = "Actix-web example microservice for benchmark: raw postgres implementation"
 authors = ["Maksym Vorobiov <maxim.vorobjov@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[[bin]]
-name = "server"
-path = "src/main.rs"
 
 [dependencies]
 actix = { version = "0.9", features = ["http"] }

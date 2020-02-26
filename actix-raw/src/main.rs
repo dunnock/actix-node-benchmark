@@ -1,6 +1,6 @@
 use actix::Addr;
 use actix_web::{get, post, web, App, Error, HttpServer, Responder};
-use sped_actix::{CreateTasks, GetTask, GetTasks, PgConnection};
+use actix_raw::{CreateTasks, GetTask, GetTasks, PgConnection};
 use std::time::Duration;
 use tokio::time::delay_for;
 use tokio_postgres::NoTls;
