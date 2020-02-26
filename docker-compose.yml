@@ -19,7 +19,7 @@ services:
 
   actix:
     container_name: actix
-    build: ./sped-actix
+    build: ./actix-bench
     depends_on:
       - database
     links:
@@ -27,7 +27,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - DB_HOST=database
+      - DB.HOST=database
       - REDIS_HOST=redis
     volumes:
       - ./sped-actix:/usr/app/
