@@ -77,25 +77,72 @@ async fn monitor_processes() -> anyhow::Result<ProcessesReport> {
     })
 }
 
+#[derive(Default)]
+struct WrkStats {
+    latency: f32,
+    rps: usize,
+}
+
+fn process_wrk(out: Vec<u8>) -> anyhow::Result<WrkStats> {
+    let stdout = String::from_utf8(out)?;
+    let latency_re = regex::Regex::new(r"Latency\s+(\d+)")?;
+    let rps_re = regex::Regex::new(r"Requests/sec:\s+(\d+)")?;
+    let mut res = WrkStats::default();
+
+    for line in stdout.lines() {
+        if let Some(latency) = latency_re.captures(line) {
+            res.latency = latency.get(1).unwrap().as_str().parse()?;
+        }
+        if let Some(rps) = rps_re.captures(line) {
+            res.rps = rps.get(1).unwrap().as_str().parse()?;
+        }
+    };
+    Ok(res)
+}
+
+struct Results {
+    name: String,
+    concurrency: u16,
+    proc_stats: ProcessesReport,
+    wrk_stats: WrkStats,
+}
+
 #[tokio::main(core_threads = 1)]
 async fn main() -> anyhow::Result<()> {
     let opt = Opt::from_args();
     let node_url = format!("http://{}:{}/tasks", opt.host, opt.node_port);
     let actix_url = format!("http://{}:{}/tasks", opt.host, opt.actix_port);
+    let mut results: Vec<Results> = Vec::new();
+
 
     let mut c = 1u16;
     while c < opt.max_concurrency {
-        println!("node");
-        let wrk = wrk(c, &node_url).output();
-        let proc_stats = if opt.monitor {
-                delay_for(Duration::from_secs(10)).await;
-                monitor_processes().await?
-            } else {
-                ProcessesReport::default()
-            };
-        let stdout = String::from_utf8(wrk.await?.stdout)?;
-        for line in stdout.lines() {
-            if line.contains("Latency") {}
+        println!("concurrency = {}", c);
+        for sol in &[("node", &node_url), ("actix", &actix_url)] {
+            let wrk = wrk(c, &sol.1).output();
+            let proc_stats = if opt.monitor {
+                    delay_for(Duration::from_secs(10)).await;
+                    monitor_processes().await?
+                } else {
+                    ProcessesReport::default()
+                };
+            let wrk_stats = process_wrk(wrk.await?.stdout)?;
+            println!(r"{},\t{},\t{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}", 
+                sol.0, c, 
+                proc_stats.postgres.cpu,
+                proc_stats.postgres.mem,
+                proc_stats.node.cpu,
+                proc_stats.node.mem,
+                proc_stats.actix.cpu,
+                proc_stats.actix.mem,
+                wrk_stats.latency,
+                wrk_stats.rps
+            );
+            results.push(
+                Results { 
+                    name: sol.0.to_owned(), concurrency: c, proc_stats, wrk_stats 
+                }
+            );
         }
         c *= 2;
     }

@@ -11,3 +11,4 @@ structopt = "0.3"
 tokio = { version = "0.2", features = ["process", "rt-threaded", "macros", "io-util", "time"] }
 psutil = "3"
 anyhow = "1"
+regex = "1"
