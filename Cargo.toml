@@ -1,2 +1,2 @@
 [workspace]
-members = [ "actix-raw", "actix-bench" ]
+members = [ "actix-raw", "actix-bench", "benchit" ]
