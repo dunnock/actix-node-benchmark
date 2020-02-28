@@ -1,5 +1,4 @@
 use structopt::StructOpt;
-use tokio::process::ChildStdout;
 use tokio::process::Command;
 use std::process::Stdio;
 use tokio::time::{delay_for, Duration};
@@ -24,13 +23,16 @@ struct Opt {
     /// Monitor local processes: node, actix and postgres
     #[structopt(short="m", long="monitor")]
     monitor: bool,
+    /// Measurement time in seconds
+    #[structopt(short="t", long="time", default_value="60")]
+    time: u16,
 }
 
-fn wrk(concurrency: u16, url: &String) -> Command {
+fn wrk(concurrency: u16, url: &String, delay: u16) -> Command {
     let mut wrk = Command::new("wrk");
     wrk .arg(format!("-t {}", concurrency/10+1))
         .arg(format!("-c {}", concurrency))
-        .arg("-d60s")
+        .arg(format!("-d{}s", delay))
         .arg(url)
         .kill_on_drop(true)
         .stdout(Stdio::piped());
@@ -119,14 +121,17 @@ async fn main() -> anyhow::Result<()> {
     while c < opt.max_concurrency {
         println!("concurrency = {}", c);
         for sol in &[("node", &node_url), ("actix", &actix_url)] {
-            let wrk = wrk(c, &sol.1).output();
+            let wrk = wrk(c, &sol.1, opt.time).output();
+
             let proc_stats = if opt.monitor {
-                    delay_for(Duration::from_secs(10)).await;
+                    delay_for(Duration::from_secs(opt.time as u64 / 2)).await;
                     monitor_processes().await?
                 } else {
                     ProcessesReport::default()
                 };
+
             let wrk_stats = process_wrk(wrk.await?.stdout)?;
+
             println!("{:5},\t{},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{}", 
                 sol.0, c, 
                 proc_stats.postgres.cpu / 100f32,
@@ -138,6 +143,7 @@ async fn main() -> anyhow::Result<()> {
                 wrk_stats.latency,
                 wrk_stats.rps
             );
+
             results.push(
                 Results { 
                     name: sol.0.to_owned(), concurrency: c, proc_stats, wrk_stats 
