@@ -1,7 +1,6 @@
 use crate::{errors::BenchError, models::Task, GetTasksQuery};
 use tokio_pg_mapper::FromTokioPostgresRow;
 use tokio_postgres::types::Type;
-use std::convert::TryFrom;
 use deadpool_postgres::readonly::ReadonlyPool;
 use std::sync::Arc;
 
@@ -28,11 +27,11 @@ pub async fn get_tasks(db_pool: Arc<ReadonlyPool>, query: GetTasksQuery) -> Resu
 			&[
 				&like(query.assignee_name),
 				&like(query.summary),
-				&query.limit
+				&query.limit.unwrap_or(10)
 			],
 		)
 		.await?
 		.iter()
-		.map(Task::try_from)
+		.map(|row| Task::from_row_ref(row).map_err(BenchError::from))
 		.collect()
 }
