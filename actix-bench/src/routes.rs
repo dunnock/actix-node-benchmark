@@ -1,6 +1,6 @@
 use actix_web::{get, web::{Query, Data}, HttpResponse};
 use crate::{errors::BenchError, db};
-use deadpool_postgres::Pool;
+use deadpool_postgres::readonly::ReadonlyPool;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -17,8 +17,10 @@ pub struct GetTasksQuery {
 /// - LIMIT :limit
 /// - full=true will return task.description
 #[get("/tasks")]
-pub async fn get_tasks( query: Query<GetTasksQuery>, db_pool: Data<Pool> ) -> Result<HttpResponse, BenchError> {
-    let tasks = db::get_tasks(db_pool.into_inner(), query.into_inner()).await?;
+pub async fn get_tasks( 
+    query: Query<GetTasksQuery>, db_pool: Data<ReadonlyPool> 
+) -> Result<HttpResponse, BenchError> {
 
+    let tasks = db::get_tasks(db_pool.into_inner(), query.into_inner()).await?;
     Ok(HttpResponse::Ok().json(tasks))
 }

@@ -13,7 +13,7 @@ serde = { version = "1", features = ["derive"] }
 actix-rt = "1"
 tokio-postgres = "0.5"
 env_logger = "0.7"
-deadpool-postgres = { version = "0.5", git = "https://github.com/dunnock/deadpool" }
+deadpool-postgres = { version = "0.5", git = "https://github.com/dunnock/deadpool", branch = "readonly" }
 tokio-pg-mapper = { version = "0.1.4", features = ["derive"] }
 derive_more = "0.99"
 dotenv = "0.15.0"

@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     let config = Config::from_env().unwrap();
-    let pool = config.pg.create_pool(NoTls).unwrap();
+    let pool = config.pg.create_readonly_pool(NoTls).unwrap();
 
     println!("Server available at http://127.0.0.1:3002/");
 

@@ -631,7 +631,7 @@ dependencies = [
 [[package]]
 name = "deadpool"
 version = "0.5.1"
-source = "git+https://github.com/dunnock/deadpool#d42ad4bce50219d0a24e43f994f3105c86343a18"
+source = "git+https://github.com/dunnock/deadpool?branch=readonly#0025fd0cb4041d3b5c9fe492791e5e459c0fa67c"
 dependencies = [
  "async-trait",
  "config",
@@ -644,10 +644,11 @@ dependencies = [
 [[package]]
 name = "deadpool-postgres"
 version = "0.5.4"
-source = "git+https://github.com/dunnock/deadpool#d42ad4bce50219d0a24e43f994f3105c86343a18"
+source = "git+https://github.com/dunnock/deadpool?branch=readonly#0025fd0cb4041d3b5c9fe492791e5e459c0fa67c"
 dependencies = [
  "async-trait",
  "config",
+ "crossbeam-queue",
  "deadpool",
  "futures",
  "log",
