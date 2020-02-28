@@ -2,3 +2,4 @@
 db/data
 node_modules
 Cargo.lock
+npm-debug.log
