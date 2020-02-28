@@ -85,7 +85,7 @@ struct WrkStats {
 
 fn process_wrk(out: Vec<u8>) -> anyhow::Result<WrkStats> {
     let stdout = String::from_utf8(out)?;
-    let latency_re = regex::Regex::new(r"Latency\s+(\d+)")?;
+    let latency_re = regex::Regex::new(r"Latency\s+(\d+\.\d+)")?;
     let rps_re = regex::Regex::new(r"Requests/sec:\s+(\d+)")?;
     let mut res = WrkStats::default();
 
@@ -127,14 +127,14 @@ async fn main() -> anyhow::Result<()> {
                     ProcessesReport::default()
                 };
             let wrk_stats = process_wrk(wrk.await?.stdout)?;
-            println!(r"{},\t{},\t{},\t{},\t{},\t{},\t{},\t{},\t{},\t{}", 
+            println!("{:5},\t{},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{}", 
                 sol.0, c, 
-                proc_stats.postgres.cpu,
-                proc_stats.postgres.mem,
-                proc_stats.node.cpu,
-                proc_stats.node.mem,
-                proc_stats.actix.cpu,
-                proc_stats.actix.mem,
+                proc_stats.postgres.cpu / 100f32,
+                proc_stats.postgres.mem / 1024 / 1024,
+                proc_stats.node.cpu / 100f32,
+                proc_stats.node.mem / 1024 / 1024,
+                proc_stats.actix.cpu / 100f32,
+                proc_stats.actix.mem / 1024 / 1024,
                 wrk_stats.latency,
                 wrk_stats.rps
             );
