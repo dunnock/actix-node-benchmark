@@ -1,3 +1,5 @@
+'use strict'
+
 const db = require('../db/pg.js');
 
 async function get_tasks(params, res) {

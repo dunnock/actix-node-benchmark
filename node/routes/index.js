@@ -1,3 +1,5 @@
+'use strict'
+
 const express = require('express')
 const router = express.Router()
 const pg = require('../rest/api_pg.js')
@@ -9,7 +11,7 @@ router.get('/tasks', (req, res) => {
 
     db.get_tasks(assignee_name, summary, limit, full)
         .then(tasks => res.send(tasks))
-        .catch(err => {throw err})
+        .catch(createError)
 })
 
 router.get('/tasks_pg', (req, res) => {
