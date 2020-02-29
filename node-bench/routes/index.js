@@ -2,7 +2,7 @@
 
 const express = require('express')
 const router = express.Router()
-const db = require('../db/api.js');
+const db = require('../db/knex.js');
 
 router.get('/tasks', (req, res) => {
     let { assignee_name, summary, limit, full } = req.query;
