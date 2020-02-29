@@ -49,6 +49,5 @@ async function get_tasks(assignee_name, summary, limit, full) {
 
 
 module.exports = {
-    get_task,
     get_tasks
 };
