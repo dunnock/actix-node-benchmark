@@ -103,6 +103,7 @@ fn process_wrk(out: Vec<u8>) -> anyhow::Result<WrkStats> {
 }
 
 struct Results {
+    test: String,
     name: String,
     concurrency: u16,
     proc_stats: ProcessesReport,
@@ -119,10 +120,10 @@ async fn main() -> anyhow::Result<()> {
     // table header
     println!("Target,\tConcur,\tPG cpu,\tmem,\tAX cpu,\tmem,\tND cpu,\tmem,\tlat ms,\trps");
 
-    let mut c = 1u16;
     for test in &["", "?summary=wherever&full=true&limit=1"] {
         println!("Starting test /tasks{}", test);
         let url = |base: &String| format!("{}{}", base, test);
+        let mut c = 1u16;
 
         while c < opt.max_concurrency {
             println!("concurrency = {}", c);
@@ -152,7 +153,7 @@ async fn main() -> anyhow::Result<()> {
 
                 results.push(
                     Results { 
-                        name: sol.0.to_owned(), concurrency: c, proc_stats, wrk_stats 
+                        test: test.to_string(), name: sol.0.to_string(), concurrency: c, proc_stats, wrk_stats 
                     }
                 );
             }
