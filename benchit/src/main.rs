@@ -122,20 +122,25 @@ fn print_charts(data: &Vec<Results>, width: usize) {
         ( acc.0.max(res.wrk_stats.latency),
         max(acc.1, res.wrk_stats.rps) ));
 
-    for ((test, conc), results) in &data.into_iter().group_by(|r| (&r.test, r.concurrency)) {
-        println!("\nRequest /tasks{} with concurrent load {}", test, conc);
+    println!("\nLatency in ms (lower is better)");
+    for ((_test, conc), results) in &data.into_iter().group_by(|r| (&r.test, r.concurrency)) {
+        println!("\nconcurrent load {}", conc);
         let results: Vec<_> = results.collect();
-        println!("latency in ms (lower is better)");
         for result in &results {
             let size = (result.wrk_stats.latency * width as f32 / max_lat) as usize + 1;
-            println!("{:6} |{:width$}|", result.name, bars(size), width = width);
-        }        
-        println!("requests per second (higher is better)");
+            println!("{:6} |{:width$}|", result.name, bars(size), width = width+2);
+        }
+    }
+
+    println!("\nRequests per second (higher is better)");
+    for ((_test, conc), results) in &data.into_iter().group_by(|r| (&r.test, r.concurrency)) {
+        println!("\nconcurrent load {}", conc);
+        let results: Vec<_> = results.collect();
         for result in &results {
             let size = (result.wrk_stats.rps * width / max_rps) as usize + 1;
-            println!("{:6} |{:width$}|", result.name, bars(size), width = width);
-        }        
-    }
+            println!("{:6} |{:width$}|", result.name, bars(size), width = width+2);
+        }
+    }  
 }
 
 #[tokio::main(core_threads = 1)]
