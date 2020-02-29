@@ -120,39 +120,44 @@ async fn main() -> anyhow::Result<()> {
     println!("Target,\tConcur,\tPG cpu,\tmem,\tAX cpu,\tmem,\tND cpu,\tmem,\tlat ms,\trps");
 
     let mut c = 1u16;
-    while c < opt.max_concurrency {
-        println!("concurrency = {}", c);
-        for sol in &[("node", &node_url), ("actix", &actix_url)] {
-            let wrk = wrk(c, &sol.1, opt.time).output();
+    for test in &["", "?summary=wherever&full=true&limit=1"] {
+        println!("Starting test /tasks{}", test);
+        let url = |base: &String| format!("{}{}", base, test);
 
-            let proc_stats = if opt.monitor {
-                    delay_for(Duration::from_secs(opt.time as u64 / 2)).await;
-                    monitor_processes().await?
-                } else {
-                    ProcessesReport::default()
-                };
+        while c < opt.max_concurrency {
+            println!("concurrency = {}", c);
+            for sol in &[("node", url(&node_url)), ("actix", url(&actix_url))] {
+                let wrk = wrk(c, &sol.1, opt.time).output();
 
-            let wrk_stats = process_wrk(wrk.await?.stdout)?;
+                let proc_stats = if opt.monitor {
+                        delay_for(Duration::from_secs(opt.time as u64 / 2)).await;
+                        monitor_processes().await?
+                    } else {
+                        ProcessesReport::default()
+                    };
 
-            println!("{:5},\t{},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{}", 
-                sol.0, c, 
-                proc_stats.postgres.cpu / 100f32,
-                proc_stats.postgres.mem / 1024 / 1024,
-                proc_stats.node.cpu / 100f32,
-                proc_stats.node.mem / 1024 / 1024,
-                proc_stats.actix.cpu / 100f32,
-                proc_stats.actix.mem / 1024 / 1024,
-                wrk_stats.latency,
-                wrk_stats.rps
-            );
+                let wrk_stats = process_wrk(wrk.await?.stdout)?;
 
-            results.push(
-                Results { 
-                    name: sol.0.to_owned(), concurrency: c, proc_stats, wrk_stats 
-                }
-            );
+                println!("{:5},\t{},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{:3},\t{:.2},\t{}", 
+                    sol.0, c, 
+                    proc_stats.postgres.cpu / 100f32,
+                    proc_stats.postgres.mem / 1024 / 1024,
+                    proc_stats.node.cpu / 100f32,
+                    proc_stats.node.mem / 1024 / 1024,
+                    proc_stats.actix.cpu / 100f32,
+                    proc_stats.actix.mem / 1024 / 1024,
+                    wrk_stats.latency,
+                    wrk_stats.rps
+                );
+
+                results.push(
+                    Results { 
+                        name: sol.0.to_owned(), concurrency: c, proc_stats, wrk_stats 
+                    }
+                );
+            }
+            c *= 2;
         }
-        c *= 2;
     }
     Ok(())
 
