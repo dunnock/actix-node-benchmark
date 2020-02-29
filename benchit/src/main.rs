@@ -120,7 +120,7 @@ async fn main() -> anyhow::Result<()> {
     // table header
     println!("Target,\tConcur,\tPG cpu,\tmem,\tAX cpu,\tmem,\tND cpu,\tmem,\tlat ms,\trps");
 
-    for test in &["", "?summary=wherever&full=true&limit=20"] {
+    for test in &["", "?summary=wherever&full=true&limit=10"] {
         println!("Starting test /tasks{}", test);
         let url = |base: &String| format!("{}{}", base, test);
         let mut c = 1u16;
