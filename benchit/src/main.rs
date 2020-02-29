@@ -87,13 +87,18 @@ struct WrkStats {
 
 fn process_wrk(out: Vec<u8>) -> anyhow::Result<WrkStats> {
     let stdout = String::from_utf8(out)?;
-    let latency_re = regex::Regex::new(r"Latency\s+(\d+\.\d+)")?;
+    let latency_re = regex::Regex::new(r"Latency\s+(\d+\.\d+)(\w+)")?;
     let rps_re = regex::Regex::new(r"Requests/sec:\s+(\d+)")?;
     let mut res = WrkStats::default();
 
     for line in stdout.lines() {
         if let Some(latency) = latency_re.captures(line) {
             res.latency = latency.get(1).unwrap().as_str().parse()?;
+            res.latency *= match latency.get(2).unwrap().as_str() {
+                "s" => 1000f32,
+                "us" => 0.0001f32,
+                _ => 1f32,
+            }
         }
         if let Some(rps) = rps_re.captures(line) {
             res.rps = rps.get(1).unwrap().as_str().parse()?;
