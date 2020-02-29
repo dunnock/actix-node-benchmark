@@ -126,7 +126,7 @@ async fn main() -> anyhow::Result<()> {
         let mut c = 1u16;
 
         while c < opt.max_concurrency {
-            println!("concurrency = {}", c);
+            println!("concurrent load = {}", c);
             for sol in &[("node", url(&node_url)), ("actix", url(&actix_url))] {
                 let wrk = wrk(c, &sol.1, opt.time).output();
 
