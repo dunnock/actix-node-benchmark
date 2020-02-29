@@ -5,6 +5,13 @@ Presume we have working node.js server with postgresql and redis DB, table task 
 
 For ease of setup database will be hosted in docker via docker-compose.
 
+# Project structure
+
+- node-bench - simple implementation without optimizations built with Express and Knex based on [provided example](https://github.com/robmclarty/knex-express-project-sample)
+- actix-bench - simple implementation without optimizations built with Actix-web and Deadpool based on [async-pg example](https://github.com/actix/examples/tree/master/async_pg)
+- actix-raw - low level implementation based on Actix-web and [Tokio-postgres]()
+- node-raw - low level implementation based on Express and [Node-postgres](https://node-postgres.com/)
+
 ## Start the database
 
 ```
@@ -29,7 +36,7 @@ cargo run --bin actix-bench --release
 ## Run node server
 
 ```
-cd node
+cd node-bench
 npm install
 npm run start
 ```
