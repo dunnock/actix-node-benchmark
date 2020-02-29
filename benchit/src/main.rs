@@ -117,8 +117,7 @@ async fn main() -> anyhow::Result<()> {
     let mut results: Vec<Results> = Vec::new();
 
     // table header
-    println!("      ,\t      ,\tPSQL\t   ,\tACTIX\t   ,\tNODE\t   ,\tLtncy,\tRate");
-    println!("Target,\tConcur,\tcpu,\tmem,\tcpu,\tmem,\tcpu,\tmem,\tms   ,\trps");
+    println!("Target,\tConcur,\tPG cpu,\tmem,\tAX cpu,\tmem,\tND cpu,\tmem,\tlat ms,\trps");
 
     let mut c = 1u16;
     while c < opt.max_concurrency {
