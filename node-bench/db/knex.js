@@ -7,8 +7,8 @@ const knex = require('knex')({
         database : 'sped'
     },
     pool: {
-        min: 2,
-        max: 10
+        min: 5,
+        max: 15
     }
 });
 
