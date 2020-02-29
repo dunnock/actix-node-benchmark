@@ -114,7 +114,7 @@ use itertools::Itertools;
 use std::cmp::max;
 
 fn bars(n: usize) -> String {
-    std::iter::repeat("*").take(10).collect::<String>()
+    std::iter::repeat("*").take(n).collect::<String>()
 }
 
 fn print_charts(data: &Vec<Results>, width: usize) {
@@ -128,12 +128,12 @@ fn print_charts(data: &Vec<Results>, width: usize) {
         println!("latency in ms (lower is better)");
         for result in &results {
             let size = (result.wrk_stats.latency * width as f32 / max_lat) as usize + 1;
-            println!("{} |{:width$}|", result.name, bars(size), width = width);
+            println!("{:6} |{:width$}|", result.name, bars(size), width = width);
         }        
         println!("requests per second (higher is better)");
         for result in &results {
             let size = (result.wrk_stats.rps * width / max_rps) as usize + 1;
-            println!("{} |{:width$}|", result.name, bars(size), width = width);
+            println!("{:6} |{:width$}|", result.name, bars(size), width = width);
         }        
     }
 }
