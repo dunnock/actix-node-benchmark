@@ -116,6 +116,9 @@ async fn main() -> anyhow::Result<()> {
     let actix_url = format!("http://{}:{}/tasks", opt.host, opt.actix_port);
     let mut results: Vec<Results> = Vec::new();
 
+    // table header
+    println!("      ,\t      ,\tPSQL\t   ,\tACTIX\t   ,\tNODE\t   ,\tLtncy,\tRate");
+    println!("Target,\tConcur,\tcpu,\tmem,\tcpu,\tmem,\tcpu,\tmem,\tms   ,\trps");
 
     let mut c = 1u16;
     while c < opt.max_concurrency {
