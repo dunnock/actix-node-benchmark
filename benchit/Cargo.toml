@@ -12,3 +12,4 @@ tokio = { version = "0.2", features = ["process", "rt-threaded", "macros", "io-u
 psutil = "3"
 anyhow = "1"
 regex = "1"
+itertools = "0.8"

@@ -110,6 +110,34 @@ struct Results {
     wrk_stats: WrkStats,
 }
 
+use itertools::Itertools;
+use std::cmp::max;
+
+fn bars(n: usize) -> String {
+    std::iter::repeat("*").take(10).collect::<String>()
+}
+
+fn print_charts(data: &Vec<Results>, width: usize) {
+    let (max_lat, max_rps) = data.iter().fold((0f32, 0), |acc, res| 
+        ( acc.0.max(res.wrk_stats.latency),
+        max(acc.1, res.wrk_stats.rps) ));
+
+    for ((test, conc), results) in &data.into_iter().group_by(|r| (&r.test, r.concurrency)) {
+        println!("\nRequest /tasks{} with concurrent load {}", test, conc);
+        let results: Vec<_> = results.collect();
+        println!("latency in ms (lower is better)");
+        for result in &results {
+            let size = (result.wrk_stats.latency * width as f32 / max_lat) as usize + 1;
+            println!("{} |{:width$}|", result.name, bars(size), width = width);
+        }        
+        println!("requests per second (higher is better)");
+        for result in &results {
+            let size = (result.wrk_stats.rps * width / max_rps) as usize + 1;
+            println!("{} |{:width$}|", result.name, bars(size), width = width);
+        }        
+    }
+}
+
 #[tokio::main(core_threads = 1)]
 async fn main() -> anyhow::Result<()> {
     let opt = Opt::from_args();
@@ -159,6 +187,9 @@ async fn main() -> anyhow::Result<()> {
             }
             c *= 2;
         }
+
+        print_charts(&results, 100);
+        results.truncate(0);
     }
     Ok(())
 
