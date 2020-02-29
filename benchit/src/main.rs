@@ -96,7 +96,7 @@ fn process_wrk(out: Vec<u8>) -> anyhow::Result<WrkStats> {
             res.latency = latency.get(1).unwrap().as_str().parse()?;
             res.latency *= match latency.get(2).unwrap().as_str() {
                 "s" => 1000f32,
-                "us" => 0.0001f32,
+                "us" => 0.001f32,
                 _ => 1f32,
             }
         }
