@@ -49,7 +49,7 @@ cargo run --bin benchit --release -- --help
 Below is output on Ubuntu 18 running on 40CPU Xeon
 
 ```
-Target, Concur, PG cpu, mem,    AX cpu, mem,    ND cpu, mem,    lat ms, rps
+Target, Concur, PG cpu, mem,    ND cpu, mem,    AX cpu, mem,    lat ms, rps
 Starting test /tasks
 concurrent load = 1
 node ,  1,      0.33,    83,    0.56,    81,    0.00,     4,    2.06,   496

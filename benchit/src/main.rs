@@ -156,7 +156,7 @@ async fn main() -> anyhow::Result<()> {
     let mut results: Vec<Results> = Vec::new();
 
     // table header
-    println!("Target,\tConcur,\tPG cpu,\tmem,\tAX cpu,\tmem,\tND cpu,\tmem,\tlat ms,\trps");
+    println!("Target,\tConcur,\tPG cpu,\tmem,\tND cpu,\tmem,\tAX cpu,\tmem,\tlat ms,\trps");
 
     for test in &["", "?summary=wherever&full=true&limit=10"] {
         println!("Starting test /tasks{}", test);
