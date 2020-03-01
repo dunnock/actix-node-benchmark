@@ -17,7 +17,7 @@ router.get('/tasks', (req, res, next) => {
 
     db.get_tasks(assignee_name, summary, limit, full)
         .then(tasks => res.send(tasks))
-        .catch(createError)
+        .catch(err => next(createError(err)))
 })
 
 module.exports = router
