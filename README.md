@@ -21,7 +21,7 @@ docker-compose up database
 ## Fill the database
 
 ```
-cargo run --bin actix-raw --release
+cargo run --bin actix_raw --release
 ... from another console ...
 curl -XPOST "http://127.0.0.1:3001/actions/filldb?workers=100&tasks=100000"
 ...after it completes server can be shutdown
@@ -30,7 +30,7 @@ curl -XPOST "http://127.0.0.1:3001/actions/filldb?workers=100&tasks=100000"
 ## Run actix server
 
 ```
-cargo run --bin actix-bench --release
+cargo run --bin actix_bench --release
 ```
 
 ## Run node server
